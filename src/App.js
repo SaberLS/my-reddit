@@ -1,26 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
-  Button,
   Grommet,
-  Grid,
   grommet,
   Page,
   PageContent,
   PageHeader,
   Text,
+  InfiniteScroll
 } from "grommet";
 import { useDispatch, useSelector } from "react-redux";
-import { selectStatus } from "./features/reddit/redditSlice";
+import {
+  getMorePosts,
+  selectPosts,
+  selectStatus,
+} from "./features/reddit/redditSlice";
 import { AppBar } from "./components/AppBar";
-import { Moon, Sun } from "grommet-icons";
 import { deepMerge } from "grommet/utils";
 import { CardTemplate } from "./components/CardTemplate";
+import { LightSwitch } from "./components/LightSwitch";
+import { findLastPostName } from "./features/reddit/reddit_utils";
 
 function App() {
   const status = useSelector(selectStatus);
+  const posts = useSelector(selectPosts);
   const dispatch = useDispatch();
-
   const [dark, setDark] = useState(false);
 
   const theme = deepMerge(grommet, {
@@ -37,35 +41,30 @@ function App() {
   });
 
   return (
-    <Grommet theme={theme} full themeMode={dark ? "dark" : "light"}>
+    <Grommet
+      className="App"
+      theme={theme}
+      full
+      themeMode={dark ? "dark" : "light"}
+    >
       <Page>
         <AppBar>
           <Text size="large">My App</Text>
-          <Button
-          a11yTitle={dark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          icon={dark ? <Moon /> : <Sun />}
-          onClick={() => setDark(!dark)}
-          tip={{
-            content: (
-              <Box
-                pad="small"
-                round="small"
-                background={dark ? "dark-1" : "light-3"}
-              >
-                {dark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              </Box>
-            ),
-            plain: true,
-          }}
-        />
+          <LightSwitch dark={dark} setDark={setDark} />
         </AppBar>
-        <PageContent>
-          <PageHeader title="Welcome" />
-          <Grid columns="medium" gap="large" pad={{ bottom: "large" }}>
-            <CardTemplate title={"Card 1"} />
-            <CardTemplate title={"Card 2"} />
-            <CardTemplate title={"Card 3"} />
-          </Grid>
+        <PageHeader title="Welcome" />
+        <PageContent direction="column" justify="start" align="center">
+          <InfiniteScroll replace={false} show={0} step={20} onMore={() => {dispatch(getMorePosts(findLastPostName(posts)))}} items={Object.keys(posts)}>
+            {(item) => (
+              <Box
+                flex={false}
+                pad="medium"
+                background={`dark-${(item % 3) + 1}`}
+              >
+                <Text>{item}</Text>
+              </Box>
+            )}
+          </InfiniteScroll>
         </PageContent>
       </Page>
     </Grommet>

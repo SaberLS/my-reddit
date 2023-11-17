@@ -17,7 +17,6 @@
     "react-is": "16.8.0",
     "react-redux": "^8.0.1",
     "react-scripts": "5.0.1",
-    "styled-components": "^5.3.11",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
@@ -47,6 +46,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/plugin-syntax-flow": "^7.23.3",
-    "@babel/plugin-transform-private-property-in-object": "^7.23.3"
+    "@babel/plugin-transform-private-property-in-object": "^7.23.3",
+    "styled-components": "^5.3.11"
   }
 }

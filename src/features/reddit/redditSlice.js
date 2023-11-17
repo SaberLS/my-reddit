@@ -1,10 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchPosts } from "./reddit_utils";
+import { checkPostType, fetchPosts, makeGallery } from "./reddit_utils";
 
 export const getMorePosts = createAsyncThunk(
   "reddit/getMorePosts",
-  async () => {
-    const lastPostName = null; //findLastPost();
+  async (lastPostName) => {
     const response = await fetchPosts(lastPostName);
     const data = await response.json();
     console.log("getMorePosts :", data);
@@ -28,14 +27,41 @@ export const redditSlice = createSlice({
       })
       .addCase(getMorePosts.fulfilled, (state, { payload }) => {
         state.status = "idle";
-        state.posts += payload;
+        payload.data.children.forEach(({ data }) => {
+          console.log(data);
+          const type = checkPostType(data);
+          state.posts = {
+            ...state.posts,
+            [data.id]: {
+              author: data.author,
+              id: data.id,
+              mediaType: type,
+              video:
+                type === "hosted:video" ||
+                (type === "rich:video") & data.secure_media
+                  ? data.secure_media.reddit_video.dash_url
+                  : null,
+              galleryData:
+                type === "gallery"
+                  ? makeGallery(data.gallery_data.items, data.media_metadata)
+                  : null,
+              score: data.score,
+              subreddit: data.subreddit_name_prefixed,
+              title: data.title,
+              url: data.url,
+              redditLink: data.permalink,
+            },
+          };
+        });
       })
       .addCase(getMorePosts.rejected, (state, { payload }) => {
-        state.status = payload.error;
+        console.log(payload);
+        state.status = payload;
       });
   },
 });
 
 export const selectStatus = (state) => state.reddit.status;
+export const selectPosts = (state) => state.reddit.posts;
 
 export default redditSlice.reducer;
