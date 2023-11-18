@@ -1,7 +1,7 @@
 export async function fetchPosts(lastPostName) {
   const url = !lastPostName
-    ? "https://www.reddit.com/r/popular/top/.json?limit=20"
-    : `https://www.reddit.com/r/popular/top/.json?limit=20&after=t3_${lastPostName}`;
+    ? "https://www.reddit.com/r/popular/top/.json?limit=50"
+    : `https://www.reddit.com/r/popular/top/.json?limit=50&after=t3_${lastPostName}`;
   console.log(url);
   return fetch(url);
 }
@@ -46,3 +46,10 @@ export const makeGallery = (items, meta_data) => {
     return null;
   });
 };
+
+export const checkStatus = (status) => {
+  if(status === "idle"){
+    console.log(status);
+    return true;
+  }return false;
+}

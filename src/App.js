@@ -19,13 +19,14 @@ import { AppBar } from "./components/AppBar";
 import { deepMerge } from "grommet/utils";
 import { CardTemplate } from "./components/CardTemplate";
 import { LightSwitch } from "./components/LightSwitch";
-import { findLastPostName } from "./features/reddit/reddit_utils";
+import { checkStatus, findLastPostName } from "./features/reddit/reddit_utils";
 
 function App() {
   const status = useSelector(selectStatus);
   const posts = useSelector(selectPosts);
   const dispatch = useDispatch();
   const [dark, setDark] = useState(false);
+
 
   const theme = deepMerge(grommet, {
     global: {
@@ -40,6 +41,12 @@ function App() {
     },
   });
 
+  useEffect(() => {
+    dispatch(getMorePosts(findLastPostName(posts)));
+  }, [])
+
+
+
   return (
     <Grommet
       className="App"
@@ -49,20 +56,18 @@ function App() {
     >
       <Page>
         <AppBar>
-          <Text size="large">My App</Text>
+          <Text size="large">my-reddit</Text>
           <LightSwitch dark={dark} setDark={setDark} />
         </AppBar>
-        <PageHeader title="Welcome" />
         <PageContent direction="column" justify="start" align="center">
-          <InfiniteScroll replace={false} show={0} step={20} onMore={() => {dispatch(getMorePosts(findLastPostName(posts)))}} items={Object.keys(posts)}>
-            {(item) => (
-              <Box
-                flex={false}
-                pad="medium"
-                background={`dark-${(item % 3) + 1}`}
-              >
-                <Text>{item}</Text>
-              </Box>
+          <InfiniteScroll show={5} step={20} onMore={() => {
+            //console.log("called");
+            if (checkStatus(status)) {
+              dispatch(getMorePosts(findLastPostName(posts)));
+            };
+          }} items={Object.keys(posts)}>
+            {(item, index) => (
+              <li key={index}><Text>{item}</Text></li>
             )}
           </InfiniteScroll>
         </PageContent>
