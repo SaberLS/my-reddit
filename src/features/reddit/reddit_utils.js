@@ -17,14 +17,13 @@ export function findLastPostName(posts) {
 
 export function checkPostType(data) {
   if (data.is_gallery) {
-    console.log("gallery: ", data);
     return "gallery";
   } else if (data.is_video) {
     return "hosted:video";
   } else if (data.post_hint) {
     return data.post_hint;
   } else if (data.selftext_html) {
-    console.log(data.self_text)
+    console.log(data.selftext)
     console.log("text :", data)
     return "text";
   }
@@ -48,8 +47,8 @@ export const makeGallery = (items, meta_data) => {
 };
 
 export const checkStatus = (status) => {
-  if(status === "idle"){
+  if (status === "idle") {
     console.log(status);
     return true;
-  }return false;
+  } return false;
 }

@@ -28,7 +28,6 @@ export const redditSlice = createSlice({
       .addCase(getMorePosts.fulfilled, (state, { payload }) => {
         state.status = "idle";
         payload.data.children.forEach(({ data }) => {
-          console.log(data);
           const type = checkPostType(data);
           state.posts = {
             ...state.posts,
@@ -38,12 +37,16 @@ export const redditSlice = createSlice({
               mediaType: type,
               video:
                 type === "hosted:video" ||
-                (type === "rich:video") & data.secure_media
+                  (type === "rich:video") & data.secure_media
                   ? data.secure_media.reddit_video.dash_url
                   : null,
               galleryData:
                 type === "gallery"
                   ? makeGallery(data.gallery_data.items, data.media_metadata)
+                  : null,
+              text:
+                type === "text"
+                  ? data.selftext
                   : null,
               score: data.score,
               subreddit: data.subreddit_name_prefixed,
